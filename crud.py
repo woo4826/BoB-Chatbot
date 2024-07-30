@@ -6,11 +6,7 @@ import models
 from schema import Access_Data
 
 def user_exists( user_item: Access_Data, db: Session):
-    
     user = db.query(models.User_Table).filter(models.User_Table.user_id == user_item.user_id).first()
-    
-    
-    print(user_item)
     return user is not None 
 
 def write_access_data( access_item: Access_Data, db: Session):
