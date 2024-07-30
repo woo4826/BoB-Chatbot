@@ -12,7 +12,8 @@ RUN pip3 --trusted-host pypi.org --trusted-host files.pythonhosted.org install -
 
 EXPOSE 8080
 
+
 RUN chmod +x /opt/bbot/start.sh
 
 
-CMD ["bash", "-c", "/opt/bbot/start.sh"]%      
+CMD ["python3", "main.py"]     

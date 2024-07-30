@@ -1,0 +1,39 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: maria
+    ports:
+      - "3306:3306"
+    
+    volumes:
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mynetwork
+    environment:
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: chatbot
+  flask:
+    build:
+      context: ./flask
+      dockerfile: Dockerfile
+    
+    container_name: flask
+    image: flask
+    restart: always
+    ports:
+      - 3000:8080
+      - 443:8080
+    environment:
+      PYTHONUNBUFFERED: 1
+    networks:
+      - mynetwork
+    depends_on:
+      - mariadb
+    command: sh -c "/opt/bbot/start.sh"
+
+
+
+networks:
+  mynetwork:
+    driver: bridge
