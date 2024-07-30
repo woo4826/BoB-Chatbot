@@ -34,3 +34,37 @@ def create_user( user_item: Access_Data, db: Session):
     db.commit()
     db.refresh(new_user)
     return True
+
+def get_ioc(db: Session):
+    ioc_list = db.query(models.Access_Table).all()
+    return [ioc.to_dict() for ioc in ioc_list]
+
+
+def get_server_data():
+    import os 
+    import time
+    import locale
+    return {
+        "host_info": {
+            "system": os.uname().sysname,
+            "node": os.uname().nodename,
+            "release": os.uname().release,
+            "version": os.uname().version,
+            "machine": os.uname().machine,
+            "time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            "locale": locale.getdefaultlocale()
+        },
+        "system_status": {
+            "uptime": os.popen("uptime").read().strip(),
+            "memory": os.popen("free -h").read().strip(),
+            "disk": os.popen("df -h").read().strip()
+        },
+        "network": {
+            "network_ip": os.popen("ip a").read().strip(),
+            "open_ports": os.popen("ss -tuln").read().strip()
+        },
+        "security": {
+            "firewall_rules": os.popen("sudo iptables -L").read().strip(),
+            "recent_logins": os.popen("last -n 5").read().strip()
+        },
+    }

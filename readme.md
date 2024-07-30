@@ -47,3 +47,8 @@ grant all privileges on chatbot.* to 'chatbot.user'@'localhost';
 ## body : { "user_id" : ${userid}, "channel_id" : ${channel_id} } 
 위 요청을 보내 access_table 에 사용자 접근 시각 등록. (서버시간 기준 UTC)
 
+## 3- [GET] http://0.0.0.0:8080/ioc
+## b
+과거 사용자 접근 목록과 server PC 의 상태정보 값을 리턴받는다.
+
+

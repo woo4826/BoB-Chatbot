@@ -10,6 +10,15 @@ class Access_Table(Base):
     access_time = Column(DateTime)
     channel_id = Column(String)
     
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "access_id": self.access_id,
+            "user_id": self.user_id,
+            "channel_id": self.channel_id,
+            "access_time": self.access_time.strftime("%Y-%m-%d %H:%M:%S") if self.access_time else None
+        }
+    
 class User_Table(Base):
     __tablename__ = 'user_table'
     
