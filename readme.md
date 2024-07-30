@@ -9,13 +9,19 @@ create user '{사용자이름}'@'{접속가능호스트}' identified by '{비번
 create database {데이터베이스 이름};
 // create database chatbot;
 
-2-1. database 내부에 table 생성
+2-1. database 내부에 access_table 생성
 CREATE TABLE access_table (
     id INT AUTO_INCREMENT NOT NULL, 
     access_id VARCHAR(100), 
     user_id VARCHAR(100), 
     channel_id VARCHAR(100), 
     access_time DATETIME, 
+    PRIMARY KEY (id)
+);
+2-2. database 내부에 user_table 생성
+CREATE TABLE user_table (
+    id INT AUTO_INCREMENT NOT NULL, 
+    user_id VARCHAR(100), 
     PRIMARY KEY (id)
 );
 

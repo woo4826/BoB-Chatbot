@@ -12,3 +12,8 @@ class Access_Data(BaseModel):
         orm_mode = True
         
         
+class User_Data(BaseModel):
+    user_id: Optional[str] = None
+    
+    class Config :
+        orm_mode = True

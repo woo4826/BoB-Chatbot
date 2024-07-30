@@ -10,3 +10,8 @@ class Access_Table(Base):
     access_time = Column(DateTime)
     channel_id = Column(String)
     
+class User_Table(Base):
+    __tablename__ = 'user_table'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String)
