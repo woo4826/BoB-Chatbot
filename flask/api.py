@@ -1,20 +1,27 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 import logging
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from schema import Access_Data, User_Data
 import database
-from sqlalchemy import create_engine
 import crud
 
+#for web
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    logging.info("Hello World")
-    return {"message": "Hello World"}
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def access_view(request: Request, db: Session = Depends(database.SQLAlchemy().get_db)):
+    template = 'index.html'
+    context = {'request': request, 'ioc_list': crud.get_ioc(db)}
+    return templates.TemplateResponse(template, context)
 
 
 @app.post("/access")

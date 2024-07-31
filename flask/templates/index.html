@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Item Details</title>
+    <link href="{{ url_for('static', path='styles.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    <h1>Item Details</h1>
+    {% for ioc in ioc_list %}
+      <div class="ioc">
+        {% comment %} 
+        id
+user_id
+access_id
+access_time
+channel_id {% endcomment %}
+        <p>Item ID: {{ ioc.id }}</p>
+        <p>User ID: {{ ioc.user_id }}</p>
+        <p>Access ID: {{ ioc.access_id }}</p>
+        <p>Access Time: {{ ioc.access_time }}</p>
+        {% comment %} <p>Item Quantity: {{ ioc.item_quantity }}</p> {% endcomment %}
+        {% comment %} <p>Item Image: <img src="{{ ioc.item_image }}" alt="Item Image"></p> {% endcomment %}
+      </div>
+      <hr>
+    {% endfor %}
+  </body>
+</html>
