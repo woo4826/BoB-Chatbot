@@ -1,15 +1,19 @@
+from sys import argv
 import uvicorn
 import os 
 from config import config
-LOG =  config['LOG']
+
+
+
 
 if __name__ == '__main__':
+
     try:
-        if LOG == 'DEV':
+        if  config["LOG"] == 'DEV':
             uvicorn.run(
                 "api:app",
                 host='0.0.0.0',
-                port=8080,
+                port=3000,
                 workers=1,
                 log_level='info',
                 reload=True,

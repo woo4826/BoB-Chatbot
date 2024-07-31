@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Item Details</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+    .left, .right {
+      padding: 20px;
+    }
+    .left {
+      flex: 1;
+      border-right: 1px solid #ddd;
+      background-color: #fff;
+      overflow-y: auto;
+    }
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #fafafa;
+    }
+    .top, .bottom {
+      padding: 20px;
+      background-color: #fff;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .top {
+      flex: 1;
+      border-bottom: 1px solid #ddd;
+    }
+    .bottom {
+      flex: 2;
+      overflow-y: auto;
+    }
+    h1, h2 {
+      color: #444;
+    }
+    .ioc {
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .ioc p {
+      margin: 5px 0;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #eee;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="left">
+      <h1>IOC Details</h1>
+      {% if ioc_list %}
+        {% for ioc in ioc_list %}
+          <div class="ioc">
+            <p><strong>Item ID:</strong> {{ ioc.id }}</p>
+            <p><strong>User ID:</strong> {{ ioc.user_id }}</p>
+            <p><strong>Access ID:</strong> {{ ioc.access_id }}</p>
+            <p><strong>Access Time:</strong> {{ ioc.access_time }}</p>
+          </div>
+          <hr>
+        {% endfor %}
+      {% else %}
+        <p>No items found.</p>
+      {% endif %}
+    </div>
+    <div class="right">
+      <div class="top">
+        <h2>About Me</h2>
+        <p>This is a placeholder for personal information.</p>
+      </div>
+      <div class="bottom">
+        <h2>System Information</h2>
+        <pre>{{ server_data.host_info | tojson(indent=2) }}</pre>
+        <h2>System Status</h2>
+        <pre>{{ server_data.system_status | tojson(indent=2) }}</pre>
+        <h2>Security</h2>
+        <pre>{{ server_data.security | tojson(indent=2) }}</pre>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+ {
+    "LOG": "PROD",
+    "DB_HOST": "mariadb",
+    "DB_USER": "root",
+    "DB_PORT": 3306,
+    "DB_PASS": "password"
+  }

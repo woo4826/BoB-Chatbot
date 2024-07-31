@@ -55,16 +55,11 @@ def get_server_data():
             "locale": locale.getdefaultlocale()
         },
         "system_status": {
-            "uptime": os.popen("uptime").read().strip(),
-            "memory": os.popen("free -h").read().strip(),
             "disk": os.popen("df -h").read().strip()
         },
-        "network": {
-            "network_ip": os.popen("ip a").read().strip(),
-            "open_ports": os.popen("ss -tuln").read().strip()
-        },
+
         "security": {
-            "firewall_rules": os.popen("sudo iptables -L").read().strip(),
+            # "firewall_rules": os.popen("sudo iptables -L").read().strip(),
             "recent_logins": os.popen("last -n 5").read().strip()
         },
     }

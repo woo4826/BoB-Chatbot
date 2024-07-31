@@ -13,13 +13,13 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: chatbot
-  flask:
+  fastapi:
     build:
-      context: ./flask
+      context: ./fastapi
       dockerfile: Dockerfile
     
-    container_name: flask
-    image: flask
+    container_name: fastapi
+    image: fastapi
     restart: always
     ports:
       - 3000:8080
