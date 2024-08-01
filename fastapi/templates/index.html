@@ -1,103 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Item Details</title>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f9;
-      color: #333;
-    }
-    .wrapper {
-      display: flex;
-      flex-direction: row;
-      height: 100vh;
-    }
-    .left, .right {
-      padding: 20px;
-    }
-    .left {
-      flex: 1;
-      border-right: 1px solid #ddd;
-      background-color: #fff;
-      overflow-y: auto;
-    }
-    .right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background-color: #fafafa;
-    }
-    .top, .bottom {
-      padding: 20px;
-      background-color: #fff;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .top {
-      flex: 1;
-      border-bottom: 1px solid #ddd;
-    }
-    .bottom {
-      flex: 2;
-      overflow-y: auto;
-    }
-    h1, h2 {
-      color: #444;
-    }
-    .ioc {
-      margin-bottom: 20px;
-      padding: 10px;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .ioc p {
-      margin: 5px 0;
-    }
-    hr {
-      border: 0;
-      border-top: 1px solid #eee;
-      margin: 20px 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrapper">
-    <div class="left">
-      <h1>IOC Details</h1>
-      {% if ioc_list %}
-        {% for ioc in ioc_list %}
-          <div class="ioc">
-            <p><strong>Item ID:</strong> {{ ioc.id }}</p>
-            <p><strong>User ID:</strong> {{ ioc.user_id }}</p>
-            <p><strong>Access ID:</strong> {{ ioc.access_id }}</p>
-            <p><strong>Access Time:</strong> {{ ioc.access_time }}</p>
-          </div>
-          <hr>
-        {% endfor %}
-      {% else %}
+  <head>
+    <meta charset="UTF-8" />
+    <title>Item Details</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      .wrapper {
+        display: flex;
+        align-items: stretch;
+        flex-direction: row;
+        height: 100vh;
+      }
+      .left,
+      .right {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .left {
+        flex: 2; /* Adjust this value to make the left panel wider */
+        border-right: 1px solid #ddd;
+        background-color: #fff;
+        overflow-y: auto;
+        position: relative; /* Add relative positioning */
+      }
+      .right {
+        flex: 1; /* Adjust this value to make the right panel narrower */
+        background-color: #fafafa;
+      }
+      .top,
+      .mid,
+      .bottom {
+        padding: 20px;
+        background-color: #fff;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .top {
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+      }
+      .mid {
+        flex: 2;
+        overflow-y: auto;
+        border-bottom: 1px solid #ddd;
+      }
+      .bottom {
+        flex: 2;
+        overflow-y: auto;
+      }
+      .ioc-header {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+        z-index: 10;
+      }
+      h1,
+      h2 {
+        color: #444;
+      }
+      .ioc {
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s, box-shadow 0.3s; /* 부드러운 효과를 위해 트랜지션 추가 */
+      }
+
+      .ioc:hover {
+        background-color: #e0e0e0; /* 호버 시 배경 색상 변경 */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 효과 추가 */
+        cursor: pointer; /* 마우스 포인터를 손가락 모양으로 변경 */
+      }
+      .ioc p {
+        margin: 5px 0;
+      }
+
+      hr {
+        border: 0;
+        border-top: 1px solid #eee;
+        margin: 20px 0;
+      }
+      .input-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0;
+        background-color: #fafafa;
+        border-top: 1px solid #ddd;
+        position: sticky; /* Make the input container sticky */
+        bottom: 0;
+        z-index: 10;
+      }
+      .input-container input {
+        flex: 1;
+        padding: 10px;
+        margin-right: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .input-container button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+      .input-container .red {
+        background-color: red;
+      }
+
+      h2 {
+        color: #4285f4;
+        margin-bottom: 1em;
+      }
+      a {
+        color: #ffffff;
+        text-decoration: none;
+        margin: 0 10px;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .icon {
+        width: 40px;
+        height: 40px;
+        margin: 0 10px;
+        vertical-align: middle;
+        border-radius: 10%;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+        background-color: #4285f4;
+        color: #121212;
+        text-transform: uppercase;
+        font-weight: bold;
+        transition: background-color 0.3s;
+      }
+      .button:hover {
+        background-color: #357af8;
+      }
+
+      .json-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 14px;
+      }
+      .json-container .json-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+      }
+      .json-container .json-key {
+        font-weight: bold;
+      }
+      .json-container .json-value {
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="left">
+        <div class="ioc-header">
+          <h1>IOC Details</h1>
+        </div>
+        {% if ioc_list %} {% for ioc in ioc_list %}
+        <div class="ioc">
+          <p><strong>Item ID:</strong> {{ ioc.id }}</p>
+          <p><strong>User ID:</strong> {{ ioc.user_id }}</p>
+          <p><strong>Access ID:</strong> {{ ioc.access_id }}</p>
+          <p><strong>Access Time:</strong> {{ ioc.access_time }}</p>
+        </div>
+        <hr />
+        {% endfor %} {% else %}
         <p>No items found.</p>
-      {% endif %}
-    </div>
-    <div class="right">
-      <div class="top">
-        <h2>About Me</h2>
-        <p>This is a placeholder for personal information.</p>
+        {% endif %}
+        <div class="input-container">
+          <input type="text" id="user_id_input" placeholder="Enter User ID" />
+          <button onclick="createAccess()">Create Access</button>
+          <button class="red" onclick="createUser()">Create User</button>
+        </div>
       </div>
-      <div class="bottom">
-        <h2>System Information</h2>
-        <pre>{{ server_data.host_info | tojson(indent=2) }}</pre>
-        <h2>System Status</h2>
-        <pre>{{ server_data.system_status | tojson(indent=2) }}</pre>
-        <h2>Security</h2>
-        <pre>{{ server_data.security | tojson(indent=2) }}</pre>
+      <div class="right">
+        <div class="top">
+          <div class="content">
+            <h1>BoB13기 보안제품개발 하진우</h1>
+            <img
+              src="https://camo.githubusercontent.com/6f9892e3aa0af59756af525fbc619b951e5b0b1ab548d5344ec3f93c63a501bb/68747470733a2f2f63617073756c652d72656e6465722e76657263656c2e6170702f6170693f747970653d736f667426636f6c6f723d6175746f266865696768743d3135302673656374696f6e3d68656164657226746578743d4a696e776f6f2c486126666f6e7453697a653d373026616e696d6174696f6e3d7477696e6b6c696e67"
+            />
+            <h2>Docker, FastAPI 기반 API개발</h2>
+            <p>
+              <a
+                href="https://github.com/woo4826"
+                target="_blank"
+                class="button"
+              >
+                <img
+                  src="https://play-lh.googleusercontent.com/PCpXdqvUWfCW1mXhH1Y_98yBpgsWxuTSTofy3NGMo9yBTATDyzVkqU580bfSln50bFU"
+                  class="icon"
+                  alt="GitHub"
+                />
+                GitHub
+              </a>
+              <a
+                href="https://instagram.com/jjiinnu_u"
+                target="_blank"
+                class="button"
+              >
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
+                  class="icon"
+                  alt="Instagram"
+                />
+                Instagram
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="mid">
+          {% if user_list %} {% for user in user_list %}
+          <div class="ioc" onclick="clickUser('{{ user.user_id|e }}')">
+            <p><strong>ID:</strong> {{ user.id }}</p>
+            <p><strong>User ID:</strong> {{ user.user_id }}</p>
+          </div>
+          <hr />
+          {% endfor %} {% else %}
+          <p>No items found.</p>
+          {% endif %}
+        </div>
+        <div class="bottom">
+          <h2>System Information</h2>
+
+          <div class="info-section">
+            {% for key, value in server_data.host_info.items() %}
+            <p><strong>{{ key }}:</strong> {{ value }}</p>
+            {% endfor %}
+          </div>
+
+          <h2>System Status</h2>
+          <div class="info-section">
+            {% for key, value in server_data.system_status.items() %}
+            <p><strong>{{ key }}:</strong> {{ value }}</p>
+            {% endfor %}
+          </div>
+
+          <h2>Security</h2>
+          <div class="info-section">
+            {% for key, value in server_data.security.items() %}
+            <p><strong>{{ key }}:</strong> {{ value }}</p>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+    <script>
+      function clickUser(user_id) {
+        document.getElementById("user_id_input").value = user_id;
+        createAccess();
+      }
+      function createAccess() {
+        const user_id = document.getElementById("user_id_input").value;
+        if (user_id) {
+          fetch("http://0.0.0.0:3000/access", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: user_id, channel_id: "adsf" }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status_code == 200) {
+                console.log("Success:", data);
+                window.location.reload();
+              } else {
+                document.getElementById("user_id_input").value = "";
+                alert(data.message);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert(error.message);
+            });
+        } else {
+          alert("Please enter an user ID.");
+        }
+      }
+
+      function createUser() {
+        const user_id = document.getElementById("user_id_input").value;
+        if (user_id) {
+          fetch("http://0.0.0.0:3000/user/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: user_id }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status_code == 200) {
+                console.log("User created successfully:", data);
+                window.location.reload();
+                alert("User created successfully!");
+              } else {
+                document.getElementById("user_id_input").value = "";
+                alert(data.message);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert(error.message);
+            });
+        } else {
+          alert("Please enter an user ID.");
+        }
+      }
+
+      //      function renderJsonToHtml(json, elementId) {
+      //        const container = document.getElementById(elementId);
+      //        container.innerHTML = "";
+      //        for (const [key, value] of Object.entries(json)) {
+      //          const item = document.createElement("div");
+      //          item.className = "json-item";
+      //          const keyElement = document.createElement("div");
+      //          keyElement.className = "json-key";
+      //          keyElement.textContent = key;
+      //          const valueElement = document.createElement("div");
+      //          valueElement.className = "json-value";
+      //          valueElement.textContent = value;
+      //          item.appendChild(keyElement);
+      //          item.appendChild(valueElement);
+      //          container.appendChild(item);
+      //        }
+      //      }
+      //
+      //      renderJsonToHtml(server_data.host_info, "system-info");
+      //      renderJsonToHtml(server_data.system_status, "system-status");
+      //      renderJsonToHtml(server_data.security, "security");
+      //
+    </script>
+  </body>
 </html>

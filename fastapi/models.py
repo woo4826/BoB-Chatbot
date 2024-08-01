@@ -24,3 +24,8 @@ class User_Table(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+        }

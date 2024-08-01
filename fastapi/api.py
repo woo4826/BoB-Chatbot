@@ -23,7 +23,7 @@ templates = Jinja2Templates(directory="templates")
 async def access_view(request: Request, db: Session = Depends(database.SQLAlchemy().get_db)):
     template = "index.html"
 
-    context = {"request": request, "ioc_list": crud.get_ioc(db), "server_data": crud.get_server_data(),}
+    context = {"request": request, "ioc_list": reversed(crud.get_ioc(db)), "server_data": crud.get_server_data(),"user_list": crud.get_users(db)}
     # context = {"request": request,  "server_data": crud.get_server_data(),}
 
     return templates.TemplateResponse(template, context)
@@ -41,9 +41,9 @@ async def access(access_item: Access_Data, Session=Depends(database.SQLAlchemy()
 @app.post("/user/create")
 async def access(user_item: User_Data, Session=Depends(database.SQLAlchemy().get_db)):
     if crud.create_user(user_item, Session) == True:
-        return {"message": "User data written to database"}
+        return  JSONResponse(content= {"message": "User data written to database", "status_code": 200})
     else:
-        return {"message": "User already exists"}
+        return  JSONResponse(content={"message": "User already exists", "status_code": 402})
 
 
 @app.get("/ioc")

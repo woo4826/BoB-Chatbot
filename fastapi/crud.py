@@ -39,6 +39,10 @@ def get_ioc(db: Session):
     ioc_list = db.query(models.Access_Table).all()
     return [ioc.to_dict() for ioc in ioc_list]
 
+def get_users(db: Session):
+    user_list = db.query(models.User_Table).all()
+    return [user.to_dict() for user in user_list]
+
 
 def get_server_data():
     import os 

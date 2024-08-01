@@ -1,8 +1,18 @@
+
 # Compose 실행방법
 `docker compose up`
 
+------
+# WEB UI
+localhost:3000  접속
+### 좌측 : IoC Details, 유저생성, access 생성
+우측의 유저 목록 중 유저를 눌러서도 access 생성 가능.
+
+### 우측 : 유저목록, 시스템정보
+유저 목록 / 시스템 정보
+
 -------
-# Local 실행방법
+## local 실행방법
 db 사용자 생성 및 권한부여 방법
 ## 1. maridadb/mysql 유저 생성
 create user '{사용자이름}'@'{접속가능호스트}' identified by '{비번}'
