@@ -1,3 +1,10 @@
 __pycache__/
 .vscode/
 data/
+output/
+*.zip
+config.json
+compose-config.json
+fastapi/config.json
+fastapi/config_compose.json
+config_compose.json
