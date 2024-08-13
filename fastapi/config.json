@@ -1,7 +1,0 @@
-{
-  "LOG": "DEV",
-  "DB_HOST": "localhost",
-  "DB_USER": "chatbot.user",
-  "DB_PORT" : 3306,
-  "DB_PASS": "password"
-}
