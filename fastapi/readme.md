@@ -24,6 +24,17 @@ CREATE TABLE user_table (
     user_id VARCHAR(100), 
     PRIMARY KEY (id)
 );
+   
+CREATE TABLE ioclog_table(
+    id INT AUTO_INCREMENT NOT NULL,
+    access_user_id VARCHAR(100),
+    access_ch_id VARCHAR(100),
+    message_text VARCHAR(100),
+    access_time DATETIME,
+    PRIMARY KEY (id)
+    
+
+)
 # Forign key 는 일부러 연결시키지 않음.
 
 ## 3. 사용자에게 해당 db 권한부여

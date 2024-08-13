@@ -3,7 +3,7 @@ import logging
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from schema import Access_Data, User_Data
+from schema import Access_Data, IoC_Data, IoC_Log, User_Data
 import database
 import crud
 
@@ -11,6 +11,8 @@ import crud
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+
+import vt
 
 app = FastAPI()
 
@@ -55,3 +57,8 @@ async def get_ioc(Session=Depends(database.SQLAlchemy().get_db)):
         },
         status_code=200,
     )
+
+@app.post('/ioc/log/create')
+async def get_ioc(data: IoC_Log,Session=Depends(database.SQLAlchemy().get_db)):
+    crud.write_ioc_log(data, Session)
+    return JSONResponse(content={"message": "IoC log written to database", "status_code": 200})

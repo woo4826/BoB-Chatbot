@@ -3,7 +3,7 @@ import hashlib
 from sqlalchemy.orm import Session
 
 import models
-from schema import Access_Data
+from schema import Access_Data, IoC_Log
 
 def user_exists( user_item: Access_Data, db: Session):
     user = db.query(models.User_Table).filter(models.User_Table.user_id == user_item.user_id).first()
@@ -44,6 +44,20 @@ def get_users(db: Session):
     return [user.to_dict() for user in user_list]
 
 
+
+def write_ioc_log(log:IoC_Log, db: Session):
+    print(log)
+    new_log = models.IocLog_Table(
+        access_user_id=log.access_user_id,
+        access_ch_id=log.access_ch_id,
+        message_text=log.message_text,
+        access_time=log.access_time or datetime.datetime.utcnow(),
+    )
+    db.add(new_log)
+    db.commit()
+    db.refresh(new_log)
+     
+        
 def get_server_data():
     import os 
     import time
@@ -67,3 +81,4 @@ def get_server_data():
             "recent_logins": os.popen("last -n 5").read().strip()
         },
     }
+    
