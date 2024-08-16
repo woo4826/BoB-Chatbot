@@ -12,7 +12,8 @@ from urllib3.exceptions import InsecureRequestWarning
 import vt
 from config import config
 from typing import Union, Dict
-
+from crawler import get_user_info
+import v_meta
 # Disable SSL warnings
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -22,32 +23,33 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 # Slack configuration
-BOT_TOKEN = config['bot_token']
-SOCKET_TOKEN = config['bot_socket']
-ALLOW_USERS = ['U03C7RT9GA1']
+BOT_TOKEN = config["bot_token"]
+SOCKET_TOKEN = config["bot_socket"]
+ALLOW_USERS = ["U03C7RT9GA1"]
 
 # Initialize Slack client
-SLACK_CLIENT = SocketModeClient(
-    app_token=SOCKET_TOKEN,
-    web_client=WebClient(token=BOT_TOKEN, ssl=ssl_context)
-)
+SLACK_CLIENT = SocketModeClient(app_token=SOCKET_TOKEN, web_client=WebClient(token=BOT_TOKEN, ssl=ssl_context))
+
 
 # Helper functions
 def is_allowed_user(user_id: str) -> bool:
     """Check if the user is allowed."""
     return user_id in ALLOW_USERS
 
-def send_slack_message(client: WebClient, channel: str,thread_ts: Union[str, None] = None, timestamp: Union[str, None] = None, text: str = "") -> None:
+
+def send_slack_message(
+    client: WebClient,
+    channel: str,
+    thread_ts: Union[str, None] = None,
+    timestamp: Union[str, None] = None,
+    text: str = "",
+) -> None:
     """Send a message to Slack."""
     try:
-        client.chat_postMessage(
-            text=text,
-            channel=channel,
-            thread_ts=timestamp,
-            timestamp=timestamp
-        )
+        client.chat_postMessage(text=text, channel=channel, thread_ts=timestamp, timestamp=timestamp)
     except Exception as e:
-        logging.warning('Error sending Slack message: %s', str(e))
+        logging.warning("Error sending Slack message: %s", str(e))
+
 
 def process_message(client: SocketModeClient, req: SocketModeRequest) -> None:
     """Process a message event."""
@@ -56,29 +58,60 @@ def process_message(client: SocketModeClient, req: SocketModeRequest) -> None:
     channel = event["channel"]
     message_text = event["text"]
     timestamp = event["ts"]
-    thread_ts = event['event_ts'] 
+    thread_ts = event["event_ts"]
     if not is_allowed_user(user_id):
         return
-    
-    if "ioc" not in message_text:
+
+    if "ioc" not in message_text and "bob" not in message_text:
         return
-    
-    target_ip = message_text.split('ioc')[1].strip()
-    try:
-        vt_res = vt.virustotal(target_ip, 'ip')
-        send_slack_message(client = client.web_client, channel=channel,thread_ts=thread_ts, timestamp=timestamp, text= str(vt_res))
-        payload = {
-            "access_user_id": user_id,
-            "access_ch_id": channel,
-            "message_text": message_text,
-            "access_time": datetime.datetime.fromtimestamp(float(timestamp)).strftime('%Y-%m-%d %H:%M:%S'),
-        }
-        print(payload)
-        post_res = requests.post('http://localhost:3000/ioc/log/create',  json=payload)
-        logging.info('Posted to API: %s', post_res)
-    except Exception as e:
-        send_slack_message(client = client.web_client, channel=channel,thread_ts=thread_ts, timestamp=timestamp, text= 'Error processing the request')
-        logging.warning('Process message error: %s', str(e))
+
+    if "ioc" in message_text:
+        target_ip = message_text.split("ioc")[1].strip()
+
+        try:
+            vt_res = vt.virustotal(target_ip, "ip")
+            meta_res = v_meta.metadefender(target_ip, "ip")
+            res = f"virustotal: {vt_res}\nmetadefender: {meta_res}"
+            
+            send_slack_message(
+                client=client.web_client, channel=channel, thread_ts=thread_ts, timestamp=timestamp, text= str(res)
+            )
+            payload = {
+                "access_user_id": user_id,
+                "access_ch_id": channel,
+                "message_text": message_text,
+                "access_time": datetime.datetime.fromtimestamp(float(timestamp)).strftime("%Y-%m-%d %H:%M:%S"),
+            }
+            print(payload)
+            post_res = requests.post("http://localhost:3000/ioc/log/create", json=payload)
+            logging.info("Posted to API: %s", post_res)
+        except Exception as e:
+            send_slack_message(
+                client=client.web_client,
+                channel=channel,
+                thread_ts=thread_ts,
+                timestamp=timestamp,
+                text="Error processing the request",
+            )
+            logging.warning("Process message error: %s", str(e))
+        # Process IP IOC
+
+    if "bob" in message_text:
+        # Process
+        print(message_text)
+        user_name = message_text.split("bob")[1].strip()
+        user_data = get_user_info(user_name=user_name)
+        print(user_data)
+
+        return_str = ""
+        if "error" in user_data:
+            return_str = user_data["error"]
+        else:
+            return_str = f"이름: {user_data['name']}\n별명: {user_data['별명']}\n출생: {user_data['출생']}\n학력: {user_data['학력']}\nBoB: {user_data['BoB']}\n기수: {user_data['기수']}\n트랙: {user_data['트랙']}"
+        send_slack_message(
+            client=client.web_client, channel=channel, thread_ts=thread_ts, timestamp=timestamp, text=return_str
+        )
+
 
 def process_interactive_request(client: SocketModeClient, req: SocketModeRequest) -> None:
     """Process an interactive request."""
@@ -92,12 +125,13 @@ def process_interactive_request(client: SocketModeClient, req: SocketModeRequest
                 "callback_id": "hello-modal",
                 "title": {"type": "plain_text", "text": "Greetings!"},
                 "submit": {"type": "plain_text", "text": "Good Bye"},
-                "blocks": [{"type": "section", "text": {"type": "mrkdwn", "text": "Hello!"}}]
-            }
+                "blocks": [{"type": "section", "text": {"type": "mrkdwn", "text": "Hello!"}}],
+            },
         )
     elif req.payload.get("type") == "view_submission" and req.payload["view"]["callback_id"] == "hello-modal":
         response = SocketModeResponse(envelope_id=req.envelope_id)
         client.send_socket_mode_response(response)
+
 
 def process(client: SocketModeClient, req: SocketModeRequest) -> None:
     """Process a request based on its type."""
@@ -109,6 +143,7 @@ def process(client: SocketModeClient, req: SocketModeRequest) -> None:
     elif req.type == "interactive":
         process_interactive_request(client, req)
 
+
 # Main entry point
 if __name__ == "__main__":
     try:
@@ -116,4 +151,4 @@ if __name__ == "__main__":
         SLACK_CLIENT.connect()
         Event().wait()
     except Exception as e:
-        logging.warning('Main function error: %s', str(e))
+        logging.warning("Main function error: %s", str(e))
